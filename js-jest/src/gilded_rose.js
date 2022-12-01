@@ -15,6 +15,8 @@ class Shop {
   updateQuality() {
     const newItems = this.items.map((item) => {
       switch (item.name) {
+        case "Conjured":
+          return updateConjuredItem(item);
         case "Aged Brie":
           return updateAgedBrie(item);
         case "Sulfuras, Hand of Ragnaros":
@@ -22,7 +24,7 @@ class Shop {
         case "Backstage passes to a TAFKAL80ETC concert":
           return updateBackstagePasses(item);
         default:
-          return updateBasicItem(item);
+          return updateNormalItem(item);
       }
     });
 
@@ -45,7 +47,25 @@ function prepareItem(item) {
   }
 }
 
-function updateBasicItem(item) {
+function updateConjuredItem(item) {
+  if (item.sellIn <= 0) {
+    // degrade twice as fast
+    return {
+      ...item,
+      sellIn: item.sellIn - 1,
+      quality: Math.max(item.quality - 4, 0),
+    };
+  }
+
+  // else
+  return {
+    ...item,
+    sellIn: item.sellIn - 1,
+    quality: Math.max(item.quality - 2, 0),
+  };
+}
+
+function updateNormalItem(item) {
   if (item.sellIn <= 0) {
     // degrade twice as fast
     return {

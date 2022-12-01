@@ -1,7 +1,7 @@
 const { Shop, Item } = require("../src/gilded_rose");
 
 describe("Gilded Rose - update quality", () => {
-  describe("basic items", () => {
+  describe("Normal items", () => {
     it("should handle the basic lifecycle", () => {
       const gildedRose = new Shop([
         new Item("foo", 10, 50),
@@ -46,7 +46,20 @@ describe("Gilded Rose - update quality", () => {
     });
   });
 
-  describe("aged brie", () => {
+  describe("Conjured items", () => {
+    it("should degrade twice as fast as normal items", () => {
+      const gildedRose = new Shop([
+        new Item("Conjured", 5, 10),
+        new Item("Conjured", 0, 10),
+      ]);
+      const items = gildedRose.updateQuality();
+
+      expect(items[0].quality).toBe(8);
+      expect(items[1].quality).toBe(6);
+    });
+  });
+
+  describe("Aged Brie", () => {
     it("should increase in quality", () => {
       const gildedRose = new Shop([
         new Item("Aged Brie", 10, 10),
@@ -80,7 +93,7 @@ describe("Gilded Rose - update quality", () => {
     });
   });
 
-  describe("sulfuras", () => {
+  describe("Sulfuras", () => {
     it("should be qualtiy 80 and it never alters", () => {
       // TODO: check for Sulfuras inside the name, not this exact string
       const gildedRose = new Shop([
@@ -99,7 +112,7 @@ describe("Gilded Rose - update quality", () => {
     });
   });
 
-  describe("backstage passes", () => {
+  describe("Backstage Passes", () => {
     it("should limit quality to 50 at initialisation", () => {
       const gildedRose = new Shop([
         new Item("Backstage passes to a TAFKAL80ETC concert", 20, 90),
