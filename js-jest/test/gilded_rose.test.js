@@ -81,28 +81,21 @@ describe("Gilded Rose - update quality", () => {
   });
 
   describe("sulfuras", () => {
-    it("should never be sold or decreased in quality", () => {
+    it("should be qualtiy 80 and it never alters", () => {
       // TODO: check for Sulfuras inside the name, not this exact string
       const gildedRose = new Shop([
         new Item("Sulfuras, Hand of Ragnaros", 10, 10),
         new Item("Sulfuras, Hand of Ragnaros", 20, 40),
+        new Item("Sulfuras, Hand of Ragnaros", 0, 80),
       ]);
       const items = gildedRose.updateQuality();
 
       expect(items[0].sellIn).toBe(10);
-      expect(items[0].quality).toBe(10);
+      expect(items[0].quality).toBe(80);
       expect(items[1].sellIn).toBe(20);
-      expect(items[1].quality).toBe(40);
-    });
-
-    it("should limit quality to 50 at initialisation", () => {
-      const gildedRose = new Shop([
-        new Item("Sulfuras, Hand of Ragnaros", 20, 90),
-      ]);
-      const items = gildedRose.updateQuality();
-
-      expect(items[0].sellIn).toBe(20);
-      expect(items[0].quality).toBe(50);
+      expect(items[1].quality).toBe(80);
+      expect(items[2].sellIn).toBe(0);
+      expect(items[2].quality).toBe(80);
     });
   });
 

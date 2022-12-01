@@ -7,10 +7,17 @@ class Item {
 }
 
 function prepareItem(item) {
-  return {
-    ...item,
-    quality: Math.min(50, Math.max(0, item.quality)),
-  };
+  if (item.name === "Sulfuras, Hand of Ragnaros") {
+    return {
+      ...item,
+      quality: 80,
+    };
+  } else {
+    return {
+      ...item,
+      quality: Math.min(50, Math.max(0, item.quality)),
+    };
+  }
 }
 
 class Shop {
