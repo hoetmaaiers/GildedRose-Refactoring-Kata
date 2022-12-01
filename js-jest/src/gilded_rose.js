@@ -6,6 +6,31 @@ class Item {
   }
 }
 
+class Shop {
+  constructor(items = []) {
+    this.items = items;
+    this.items = items.map(prepareItem);
+  }
+
+  updateQuality() {
+    const newItems = this.items.map((item) => {
+      switch (item.name) {
+        case "Aged Brie":
+          return updateAgedBrie(item);
+        case "Sulfuras, Hand of Ragnaros":
+          return updateSulfuras(item);
+        case "Backstage passes to a TAFKAL80ETC concert":
+          return updateBackstagePasses(item);
+        default:
+          return updateBasicItem(item);
+      }
+    });
+
+    this.items = newItems;
+    return this.items;
+  }
+}
+
 function prepareItem(item) {
   if (item.name === "Sulfuras, Hand of Ragnaros") {
     return {
@@ -20,68 +45,81 @@ function prepareItem(item) {
   }
 }
 
-class Shop {
-  constructor(items = []) {
-    this.items = items;
-    this.items = items.map(prepareItem);
+function updateBasicItem(item) {
+  if (item.sellIn <= 0) {
+    // degrade twice as fast
+    return {
+      ...item,
+      sellIn: item.sellIn - 1,
+      quality: Math.max(item.quality - 2, 0),
+    };
   }
-  updateQuality() {
-    for (let i = 0; i < this.items.length; i++) {
-      if (
-        this.items[i].name != "Aged Brie" &&
-        this.items[i].name != "Backstage passes to a TAFKAL80ETC concert"
-      ) {
-        if (this.items[i].quality > 0) {
-          if (this.items[i].name != "Sulfuras, Hand of Ragnaros") {
-            this.items[i].quality = this.items[i].quality - 1;
-          }
-        }
-      } else {
-        if (this.items[i].quality < 50) {
-          this.items[i].quality = this.items[i].quality + 1;
-          if (
-            this.items[i].name == "Backstage passes to a TAFKAL80ETC concert"
-          ) {
-            if (this.items[i].sellIn < 11) {
-              if (this.items[i].quality < 50) {
-                this.items[i].quality = this.items[i].quality + 1;
-              }
-            }
-            if (this.items[i].sellIn < 6) {
-              if (this.items[i].quality < 50) {
-                this.items[i].quality = this.items[i].quality + 1;
-              }
-            }
-          }
-        }
-      }
-      if (this.items[i].name != "Sulfuras, Hand of Ragnaros") {
-        this.items[i].sellIn = this.items[i].sellIn - 1;
-      }
-      if (this.items[i].sellIn < 0) {
-        if (this.items[i].name != "Aged Brie") {
-          if (
-            this.items[i].name != "Backstage passes to a TAFKAL80ETC concert"
-          ) {
-            if (this.items[i].quality > 0) {
-              if (this.items[i].name != "Sulfuras, Hand of Ragnaros") {
-                this.items[i].quality = this.items[i].quality - 1;
-              }
-            }
-          } else {
-            this.items[i].quality =
-              this.items[i].quality - this.items[i].quality;
-          }
-        } else {
-          if (this.items[i].quality < 50) {
-            this.items[i].quality = this.items[i].quality + 1;
-          }
-        }
-      }
-    }
 
-    return this.items;
+  // else
+  return {
+    ...item,
+    sellIn: item.sellIn - 1,
+    quality: Math.max(item.quality - 1, 0),
+  };
+}
+
+function updateAgedBrie(item) {
+  if (item.sellIn <= 0) {
+    // increase twice as fast
+    return {
+      ...item,
+      sellIn: item.sellIn - 1,
+      quality: Math.min(item.quality + 2, 50),
+    };
   }
+
+  // else
+  return {
+    ...item,
+    sellIn: item.sellIn - 1,
+    quality: Math.min(item.quality + 1, 50),
+  };
+}
+
+function updateBackstagePasses(item) {
+  if (item.sellIn <= 0) {
+    // increase twice as fast
+    return {
+      ...item,
+      sellIn: item.sellIn - 1,
+      quality: 0,
+    };
+  }
+
+  if (item.sellIn <= 5) {
+    // increase twice as fast
+    return {
+      ...item,
+      sellIn: item.sellIn - 1,
+      quality: Math.min(item.quality + 3, 50),
+    };
+  }
+
+  if (item.sellIn <= 10) {
+    // increase twice as fast
+    return {
+      ...item,
+      sellIn: item.sellIn - 1,
+      quality: Math.min(item.quality + 2, 50),
+    };
+  }
+
+  // else
+  return {
+    ...item,
+    sellIn: item.sellIn - 1,
+    quality: Math.min(item.quality + 1, 50),
+  };
+}
+
+function updateSulfuras(item) {
+  // never alter
+  return item;
 }
 
 module.exports = {

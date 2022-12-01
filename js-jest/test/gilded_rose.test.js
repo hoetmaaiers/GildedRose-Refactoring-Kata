@@ -100,17 +100,6 @@ describe("Gilded Rose - update quality", () => {
   });
 
   describe("backstage passes", () => {
-    it("should increase by 2 when there are 10 days left to sell", () => {
-      // TODO: check for Sulfuras inside the name, not this exact string
-      const gildedRose = new Shop([
-        new Item("Backstage passes to a TAFKAL80ETC concert", 10, 10),
-      ]);
-      const items = gildedRose.updateQuality();
-
-      expect(items[0].sellIn).toBe(9);
-      expect(items[0].quality).toBe(12);
-    });
-
     it("should limit quality to 50 at initialisation", () => {
       const gildedRose = new Shop([
         new Item("Backstage passes to a TAFKAL80ETC concert", 20, 90),
@@ -119,6 +108,29 @@ describe("Gilded Rose - update quality", () => {
 
       expect(items[0].sellIn).toBe(19);
       expect(items[0].quality).toBe(50);
+    });
+
+    it("should increase in quality", () => {
+      const gildedRose = new Shop([
+        new Item("Backstage passes to a TAFKAL80ETC concert", 12, 11),
+        new Item("Backstage passes to a TAFKAL80ETC concert", 30, 19),
+      ]);
+      const items = gildedRose.updateQuality();
+
+      expect(items[0].sellIn).toBe(11);
+      expect(items[0].quality).toBe(12);
+      expect(items[1].sellIn).toBe(29);
+      expect(items[1].quality).toBe(20);
+    });
+
+    it("should increase by 2 when there are 10 days left to sell", () => {
+      const gildedRose = new Shop([
+        new Item("Backstage passes to a TAFKAL80ETC concert", 10, 10),
+      ]);
+      const items = gildedRose.updateQuality();
+
+      expect(items[0].sellIn).toBe(9);
+      expect(items[0].quality).toBe(12);
     });
 
     it("should increase by 3 when there are 5 days left to sell", () => {
