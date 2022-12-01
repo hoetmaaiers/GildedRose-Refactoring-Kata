@@ -6,6 +6,14 @@ class Item {
   }
 }
 
+const ITEM_TYPE = {
+  CONJURED: "Conjured",
+  AGED_BRIE: "Aged Brie",
+  SULFURAS: "Sulfuras",
+  BACKSTAGE_PASSES: "Backstage passes",
+  NORMAL: "Normal",
+};
+
 class Shop {
   constructor(items = []) {
     this.items = items;
@@ -14,14 +22,14 @@ class Shop {
 
   updateQuality() {
     const newItems = this.items.map((item) => {
-      switch (item.name) {
-        case "Conjured":
+      switch (getItemType(item)) {
+        case ITEM_TYPE.CONJURED:
           return updateConjuredItem(item);
-        case "Aged Brie":
+        case ITEM_TYPE.AGED_BRIE:
           return updateAgedBrie(item);
-        case "Sulfuras, Hand of Ragnaros":
+        case ITEM_TYPE.SULFURAS:
           return updateSulfuras(item);
-        case "Backstage passes to a TAFKAL80ETC concert":
+        case ITEM_TYPE.BACKSTAGE_PASSES:
           return updateBackstagePasses(item);
         default:
           return updateNormalItem(item);
@@ -31,6 +39,16 @@ class Shop {
     this.items = newItems;
     return this.items;
   }
+}
+
+function getItemType(item) {
+  if (item.name.startsWith("Conjured")) return ITEM_TYPE.CONJURED;
+  if (item.name.startsWith("Aged Brie")) return ITEM_TYPE.AGED_BRIE;
+  if (item.name.startsWith("Sulfuras")) return ITEM_TYPE.SULFURAS;
+  if (item.name.startsWith("Backstage passes"))
+    return ITEM_TYPE.BACKSTAGE_PASSES;
+  // else
+  return ITEM_TYPE.NORMAL;
 }
 
 function prepareItem(item) {

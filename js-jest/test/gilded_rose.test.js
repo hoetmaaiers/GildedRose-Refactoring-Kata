@@ -49,8 +49,8 @@ describe("Gilded Rose - update quality", () => {
   describe("Conjured items", () => {
     it("should degrade twice as fast as normal items", () => {
       const gildedRose = new Shop([
-        new Item("Conjured", 5, 10),
-        new Item("Conjured", 0, 10),
+        new Item("Conjured lemon cake", 5, 10),
+        new Item("Conjured orange cake", 0, 10),
       ]);
       const items = gildedRose.updateQuality();
 
