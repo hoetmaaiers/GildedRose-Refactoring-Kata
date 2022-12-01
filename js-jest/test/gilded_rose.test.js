@@ -19,9 +19,17 @@ describe("Gilded Rose - update quality", () => {
     });
 
     it("should never have a negative quality", () => {
-      const gildedRose = new Shop([new Item("bar", 5, 0)]);
+      const gildedRose = new Shop([new Item("foo", 5, 0)]);
       const items = gildedRose.updateQuality();
       expect(items[0].quality).toBe(0);
+    });
+
+    it("should limit quality to 50 at initialisation", () => {
+      const gildedRose = new Shop([new Item("foo", 20, 90)]);
+      const items = gildedRose.updateQuality();
+
+      expect(items[0].sellIn).toBe(19);
+      expect(items[0].quality).toBe(49);
     });
 
     it("should degrade quality twice as fast after sellBy date", () => {
@@ -36,26 +44,9 @@ describe("Gilded Rose - update quality", () => {
       expect(items[1].quality).toBe(0);
       expect(items[2].quality).toBe(0);
     });
-
-    it("should limit quality to 50", () => {
-      const gildedRose = new Shop([
-        new Item("Aged Brie", 20, 50),
-        new Item("Aged Brie", 20, 90),
-      ]);
-      const items = gildedRose.updateQuality();
-
-      expect(items[0].sellIn).toBe(19);
-      expect(items[0].quality).toBe(50);
-
-      // TODO: add this test after initial test suite setup
-      // expect(items[1].sellIn).toBe(19);
-      // expect(items[1].quality).toBe(50);
-    });
   });
 
   describe("aged brie", () => {
-    // TODO: check for quality 50 limit at construction
-    // new Item("foo", 0, 90),
     it("should increase in quality", () => {
       const gildedRose = new Shop([
         new Item("Aged Brie", 10, 10),
@@ -71,16 +62,30 @@ describe("Gilded Rose - update quality", () => {
       expect(items[2].sellIn).toBe(-1);
       expect(items[2].quality).toBe(13);
     });
+
+    it("should limit quality to 50 at initialisation", () => {
+      const gildedRose = new Shop([new Item("Aged Brie", 20, 90)]);
+      const items = gildedRose.updateQuality();
+
+      expect(items[0].sellIn).toBe(19);
+      expect(items[0].quality).toBe(50);
+    });
+
+    it("should limit quality to 50 at update", () => {
+      const gildedRose = new Shop([new Item("Aged Brie", 20, 50)]);
+      const items = gildedRose.updateQuality();
+
+      expect(items[0].sellIn).toBe(19);
+      expect(items[0].quality).toBe(50);
+    });
   });
 
   describe("sulfuras", () => {
-    it("should age twice as fast", () => {
+    it("should never be sold or decreased in quality", () => {
       // TODO: check for Sulfuras inside the name, not this exact string
       const gildedRose = new Shop([
         new Item("Sulfuras, Hand of Ragnaros", 10, 10),
         new Item("Sulfuras, Hand of Ragnaros", 20, 40),
-        // TODO: check for quality 50 limit at construction
-        // new Item("Sulfuras, Hand of Ragnaros", 20, 60),
       ]);
       const items = gildedRose.updateQuality();
 
@@ -89,6 +94,16 @@ describe("Gilded Rose - update quality", () => {
       expect(items[1].sellIn).toBe(20);
       expect(items[1].quality).toBe(40);
     });
+
+    it("should limit quality to 50 at initialisation", () => {
+      const gildedRose = new Shop([
+        new Item("Sulfuras, Hand of Ragnaros", 20, 90),
+      ]);
+      const items = gildedRose.updateQuality();
+
+      expect(items[0].sellIn).toBe(20);
+      expect(items[0].quality).toBe(50);
+    });
   });
 
   describe("backstage passes", () => {
@@ -96,13 +111,21 @@ describe("Gilded Rose - update quality", () => {
       // TODO: check for Sulfuras inside the name, not this exact string
       const gildedRose = new Shop([
         new Item("Backstage passes to a TAFKAL80ETC concert", 10, 10),
-        // TODO: check for quality 50 limit at construction
-        // new Item("Backstage passes to a TAFKAL80ETC concert", 20, 60),
       ]);
       const items = gildedRose.updateQuality();
 
       expect(items[0].sellIn).toBe(9);
       expect(items[0].quality).toBe(12);
+    });
+
+    it("should limit quality to 50 at initialisation", () => {
+      const gildedRose = new Shop([
+        new Item("Backstage passes to a TAFKAL80ETC concert", 20, 90),
+      ]);
+      const items = gildedRose.updateQuality();
+
+      expect(items[0].sellIn).toBe(19);
+      expect(items[0].quality).toBe(50);
     });
 
     it("should increase by 3 when there are 5 days left to sell", () => {

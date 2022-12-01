@@ -6,9 +6,17 @@ class Item {
   }
 }
 
+function prepareItem(item) {
+  return {
+    ...item,
+    quality: Math.min(50, Math.max(0, item.quality)),
+  };
+}
+
 class Shop {
   constructor(items = []) {
     this.items = items;
+    this.items = items.map(prepareItem);
   }
   updateQuality() {
     for (let i = 0; i < this.items.length; i++) {
