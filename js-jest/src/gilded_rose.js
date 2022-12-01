@@ -5,7 +5,9 @@ class Item {
     this.quality = quality;
   }
 }
-
+/**
+ * Constants
+ */
 const MIN_QUALITY = 0;
 const MAX_QUALITY = 50;
 const QUALITY_SULFURAS = 80;
@@ -44,16 +46,14 @@ class Shop {
   }
 }
 
-function getItemType(item) {
-  if (item.name.startsWith("Conjured")) return ITEM_TYPE.CONJURED;
-  if (item.name.startsWith("Aged Brie")) return ITEM_TYPE.AGED_BRIE;
-  if (item.name.startsWith("Sulfuras")) return ITEM_TYPE.SULFURAS;
-  if (item.name.startsWith("Backstage passes"))
-    return ITEM_TYPE.BACKSTAGE_PASSES;
-  // else
-  return ITEM_TYPE.NORMAL;
-}
+module.exports = {
+  Item,
+  Shop,
+};
 
+/*
+ * This function is used to prepare the item before it is used in the shop.
+ */
 function prepareItem(item) {
   if (item.name.startsWith(ITEM_TYPE.SULFURAS)) {
     return {
@@ -68,94 +68,38 @@ function prepareItem(item) {
   }
 }
 
-function updateConjuredItem(item) {
-  if (item.sellIn <= 0) {
-    // degrade twice as fast
-    return {
-      ...item,
-      sellIn: item.sellIn - 1,
-      quality: Math.max(item.quality - 4, MIN_QUALITY),
-    };
-  }
+/**
+ * Update functions based on type
+ */
 
-  // else
-  return {
-    ...item,
-    sellIn: item.sellIn - 1,
-    quality: Math.max(item.quality - 2, MIN_QUALITY),
-  };
+function updateConjuredItem(item) {
+  // degrade twice as fast as normal item
+  if (item.sellIn <= 0) return updateDailyValues(item, item.quality - 4);
+  else return updateDailyValues(item, item.quality - 2);
 }
 
 function updateNormalItem(item) {
-  if (item.sellIn <= 0) {
-    // degrade twice as fast
-    return {
-      ...item,
-      sellIn: item.sellIn - 1,
-      quality: Math.max(item.quality - 2, MIN_QUALITY),
-    };
-  }
-
-  // else
-  return {
-    ...item,
-    sellIn: item.sellIn - 1,
-    quality: Math.max(item.quality - 1, MIN_QUALITY),
-  };
+  // degrade twice as fast
+  if (item.sellIn <= 0) return updateDailyValues(item, item.quality - 2);
+  else return updateDailyValues(item, item.quality - 1);
 }
 
 function updateAgedBrie(item) {
-  if (item.sellIn <= 0) {
-    // increase twice as fast
-    return {
-      ...item,
-      sellIn: item.sellIn - 1,
-      quality: Math.min(item.quality + 2, MAX_QUALITY),
-    };
-  }
-
-  // else
-  return {
-    ...item,
-    sellIn: item.sellIn - 1,
-    quality: Math.min(item.quality + 1, MAX_QUALITY),
-  };
+  // increase twice as fast
+  if (item.sellIn <= 0) return updateDailyValues(item, item.quality + 2);
+  else return updateDailyValues(item, item.quality + 1);
 }
 
 function updateBackstagePasses(item) {
-  if (item.sellIn <= 0) {
-    // increase twice as fast
-    return {
-      ...item,
-      sellIn: item.sellIn - 1,
-      quality: MIN_QUALITY,
-    };
-  }
+  // increase twice as fast
+  if (item.sellIn <= 0) return updateDailyValues(item, MIN_QUALITY);
 
-  if (item.sellIn <= 5) {
-    // increase twice as fast
-    return {
-      ...item,
-      sellIn: item.sellIn - 1,
-      quality: Math.min(item.quality + 3, MAX_QUALITY),
-    };
-  }
+  // increase twice as fast
+  if (item.sellIn <= 5) return updateDailyValues(item, item.quality + 3);
 
-  if (item.sellIn <= 10) {
-    // increase twice as fast
-    return {
-      ...item,
-      sellIn: item.sellIn - 1,
-      quality: Math.min(item.quality + 2, MAX_QUALITY),
-    };
-  }
-
-  // else
-  return {
-    ...item,
-    sellIn: item.sellIn - 1,
-    quality: Math.min(item.quality + 1, MAX_QUALITY),
-  };
+  // increase twice as fast
+  if (item.sellIn <= 10) return updateDailyValues(item, item.quality + 2);
+  else return updateDailyValues(item, item.quality + 1);
 }
 
 function updateSulfuras(item) {
@@ -163,7 +107,23 @@ function updateSulfuras(item) {
   return item;
 }
 
-module.exports = {
-  Item,
-  Shop,
-};
+/*
+ * Helper functions
+ */
+function updateDailyValues(item, newQuality) {
+  return {
+    ...item,
+    sellIn: item.sellIn - 1,
+    quality: Math.min(MAX_QUALITY, Math.max(newQuality, MIN_QUALITY)),
+  };
+}
+
+function getItemType(item) {
+  if (item.name.startsWith("Conjured")) return ITEM_TYPE.CONJURED;
+  if (item.name.startsWith("Aged Brie")) return ITEM_TYPE.AGED_BRIE;
+  if (item.name.startsWith("Sulfuras")) return ITEM_TYPE.SULFURAS;
+  if (item.name.startsWith("Backstage passes"))
+    return ITEM_TYPE.BACKSTAGE_PASSES;
+  // else
+  return ITEM_TYPE.NORMAL;
+}
