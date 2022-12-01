@@ -6,6 +6,9 @@ class Item {
   }
 }
 
+const MIN_QUALITY = 0;
+const MAX_QUALITY = 50;
+const QUALITY_SULFURAS = 80;
 const ITEM_TYPE = {
   CONJURED: "Conjured",
   AGED_BRIE: "Aged Brie",
@@ -52,15 +55,15 @@ function getItemType(item) {
 }
 
 function prepareItem(item) {
-  if (item.name === "Sulfuras, Hand of Ragnaros") {
+  if (item.name.startsWith(ITEM_TYPE.SULFURAS)) {
     return {
       ...item,
-      quality: 80,
+      quality: QUALITY_SULFURAS,
     };
   } else {
     return {
       ...item,
-      quality: Math.min(50, Math.max(0, item.quality)),
+      quality: Math.min(MAX_QUALITY, Math.max(MIN_QUALITY, item.quality)),
     };
   }
 }
@@ -71,7 +74,7 @@ function updateConjuredItem(item) {
     return {
       ...item,
       sellIn: item.sellIn - 1,
-      quality: Math.max(item.quality - 4, 0),
+      quality: Math.max(item.quality - 4, MIN_QUALITY),
     };
   }
 
@@ -79,7 +82,7 @@ function updateConjuredItem(item) {
   return {
     ...item,
     sellIn: item.sellIn - 1,
-    quality: Math.max(item.quality - 2, 0),
+    quality: Math.max(item.quality - 2, MIN_QUALITY),
   };
 }
 
@@ -89,7 +92,7 @@ function updateNormalItem(item) {
     return {
       ...item,
       sellIn: item.sellIn - 1,
-      quality: Math.max(item.quality - 2, 0),
+      quality: Math.max(item.quality - 2, MIN_QUALITY),
     };
   }
 
@@ -97,7 +100,7 @@ function updateNormalItem(item) {
   return {
     ...item,
     sellIn: item.sellIn - 1,
-    quality: Math.max(item.quality - 1, 0),
+    quality: Math.max(item.quality - 1, MIN_QUALITY),
   };
 }
 
@@ -107,7 +110,7 @@ function updateAgedBrie(item) {
     return {
       ...item,
       sellIn: item.sellIn - 1,
-      quality: Math.min(item.quality + 2, 50),
+      quality: Math.min(item.quality + 2, MAX_QUALITY),
     };
   }
 
@@ -115,7 +118,7 @@ function updateAgedBrie(item) {
   return {
     ...item,
     sellIn: item.sellIn - 1,
-    quality: Math.min(item.quality + 1, 50),
+    quality: Math.min(item.quality + 1, MAX_QUALITY),
   };
 }
 
@@ -125,7 +128,7 @@ function updateBackstagePasses(item) {
     return {
       ...item,
       sellIn: item.sellIn - 1,
-      quality: 0,
+      quality: MIN_QUALITY,
     };
   }
 
@@ -134,7 +137,7 @@ function updateBackstagePasses(item) {
     return {
       ...item,
       sellIn: item.sellIn - 1,
-      quality: Math.min(item.quality + 3, 50),
+      quality: Math.min(item.quality + 3, MAX_QUALITY),
     };
   }
 
@@ -143,7 +146,7 @@ function updateBackstagePasses(item) {
     return {
       ...item,
       sellIn: item.sellIn - 1,
-      quality: Math.min(item.quality + 2, 50),
+      quality: Math.min(item.quality + 2, MAX_QUALITY),
     };
   }
 
@@ -151,7 +154,7 @@ function updateBackstagePasses(item) {
   return {
     ...item,
     sellIn: item.sellIn - 1,
-    quality: Math.min(item.quality + 1, 50),
+    quality: Math.min(item.quality + 1, MAX_QUALITY),
   };
 }
 
