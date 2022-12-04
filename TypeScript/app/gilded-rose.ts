@@ -10,60 +10,122 @@ export class Item {
   }
 }
 
+/**
+ * Constants
+ */
+const MIN_QUALITY = 0;
+const MAX_QUALITY = 50;
+const QUALITY_SULFURAS = 80;
+const ITEM_TYPE = {
+  CONJURED: "Conjured",
+  AGED_BRIE: "Aged Brie",
+  SULFURAS: "Sulfuras",
+  BACKSTAGE_PASSES: "Backstage passes",
+  NORMAL: "Normal",
+};
+
 export class GildedRose {
   items: Array<Item>;
 
   constructor(items = [] as Array<Item>) {
     this.items = items;
+    this.items = items.map(prepareItem);
   }
 
   updateQuality() {
-    for (let i = 0; i < this.items.length; i++) {
-      if (this.items[i].name != 'Aged Brie' && this.items[i].name != 'Backstage passes to a TAFKAL80ETC concert') {
-        if (this.items[i].quality > 0) {
-          if (this.items[i].name != 'Sulfuras, Hand of Ragnaros') {
-            this.items[i].quality = this.items[i].quality - 1
-          }
-        }
-      } else {
-        if (this.items[i].quality < 50) {
-          this.items[i].quality = this.items[i].quality + 1
-          if (this.items[i].name == 'Backstage passes to a TAFKAL80ETC concert') {
-            if (this.items[i].sellIn < 11) {
-              if (this.items[i].quality < 50) {
-                this.items[i].quality = this.items[i].quality + 1
-              }
-            }
-            if (this.items[i].sellIn < 6) {
-              if (this.items[i].quality < 50) {
-                this.items[i].quality = this.items[i].quality + 1
-              }
-            }
-          }
-        }
+    const newItems = this.items.map((item) => {
+      switch (getItemType(item)) {
+        case ITEM_TYPE.CONJURED:
+          return updateConjuredItem(item);
+        case ITEM_TYPE.AGED_BRIE:
+          return updateAgedBrie(item);
+        case ITEM_TYPE.SULFURAS:
+          return updateSulfuras(item);
+        case ITEM_TYPE.BACKSTAGE_PASSES:
+          return updateBackstagePasses(item);
+        default:
+          return updateNormalItem(item);
       }
-      if (this.items[i].name != 'Sulfuras, Hand of Ragnaros') {
-        this.items[i].sellIn = this.items[i].sellIn - 1;
-      }
-      if (this.items[i].sellIn < 0) {
-        if (this.items[i].name != 'Aged Brie') {
-          if (this.items[i].name != 'Backstage passes to a TAFKAL80ETC concert') {
-            if (this.items[i].quality > 0) {
-              if (this.items[i].name != 'Sulfuras, Hand of Ragnaros') {
-                this.items[i].quality = this.items[i].quality - 1
-              }
-            }
-          } else {
-            this.items[i].quality = this.items[i].quality - this.items[i].quality
-          }
-        } else {
-          if (this.items[i].quality < 50) {
-            this.items[i].quality = this.items[i].quality + 1
-          }
-        }
-      }
-    }
+    });
 
+    this.items = newItems;
     return this.items;
   }
+}
+
+/*
+ * This function is used to prepare the item before it is used in the shop.
+ */
+function prepareItem(item) {
+  if (item.name.startsWith(ITEM_TYPE.SULFURAS)) {
+    return {
+      ...item,
+      quality: QUALITY_SULFURAS,
+    };
+  } else {
+    return {
+      ...item,
+      quality: Math.min(MAX_QUALITY, Math.max(MIN_QUALITY, item.quality)),
+    };
+  }
+}
+
+/**
+ * Update functions based on type
+ */
+
+function updateConjuredItem(item) {
+  // degrade twice as fast as normal item
+  if (item.sellIn <= 0) return updateDailyValues(item, item.quality - 4);
+  else return updateDailyValues(item, item.quality - 2);
+}
+
+function updateNormalItem(item) {
+  // degrade twice as fast
+  if (item.sellIn <= 0) return updateDailyValues(item, item.quality - 2);
+  else return updateDailyValues(item, item.quality - 1);
+}
+
+function updateAgedBrie(item) {
+  // increase twice as fast
+  if (item.sellIn <= 0) return updateDailyValues(item, item.quality + 2);
+  else return updateDailyValues(item, item.quality + 1);
+}
+
+function updateBackstagePasses(item) {
+  // increase twice as fast
+  if (item.sellIn <= 0) return updateDailyValues(item, MIN_QUALITY);
+
+  // increase twice as fast
+  if (item.sellIn <= 5) return updateDailyValues(item, item.quality + 3);
+
+  // increase twice as fast
+  if (item.sellIn <= 10) return updateDailyValues(item, item.quality + 2);
+  else return updateDailyValues(item, item.quality + 1);
+}
+
+function updateSulfuras(item) {
+  // never alter
+  return item;
+}
+
+/*
+ * Helper functions
+ */
+function updateDailyValues(item, newQuality) {
+  return {
+    ...item,
+    sellIn: item.sellIn - 1,
+    quality: Math.min(MAX_QUALITY, Math.max(newQuality, MIN_QUALITY)),
+  };
+}
+
+function getItemType(item) {
+  if (item.name.startsWith("Conjured")) return ITEM_TYPE.CONJURED;
+  if (item.name.startsWith("Aged Brie")) return ITEM_TYPE.AGED_BRIE;
+  if (item.name.startsWith("Sulfuras")) return ITEM_TYPE.SULFURAS;
+  if (item.name.startsWith("Backstage passes"))
+    return ITEM_TYPE.BACKSTAGE_PASSES;
+  // else
+  return ITEM_TYPE.NORMAL;
 }
