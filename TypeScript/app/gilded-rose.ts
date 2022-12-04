@@ -3,7 +3,7 @@ export class Item {
   sellIn: number;
   quality: number;
 
-  constructor(name, sellIn, quality) {
+  constructor(name: string, sellIn: number, quality: number) {
     this.name = name;
     this.sellIn = sellIn;
     this.quality = quality;
@@ -56,8 +56,8 @@ export class GildedRose {
 /*
  * This function is used to prepare the item before it is used in the shop.
  */
-function prepareItem(item) {
-  if (item.name.startsWith(ITEM_TYPE.SULFURAS)) {
+function prepareItem(item: Item): Item {
+  if (getItemType(item) === ITEM_TYPE.SULFURAS) {
     return {
       ...item,
       quality: QUALITY_SULFURAS,
@@ -74,25 +74,25 @@ function prepareItem(item) {
  * Update functions based on type
  */
 
-function updateConjuredItem(item) {
+function updateConjuredItem(item: Item): Item {
   // degrade twice as fast as normal item
   if (item.sellIn <= 0) return updateDailyValues(item, item.quality - 4);
   else return updateDailyValues(item, item.quality - 2);
 }
 
-function updateNormalItem(item) {
+function updateNormalItem(item: Item): Item {
   // degrade twice as fast
   if (item.sellIn <= 0) return updateDailyValues(item, item.quality - 2);
   else return updateDailyValues(item, item.quality - 1);
 }
 
-function updateAgedBrie(item) {
+function updateAgedBrie(item: Item): Item {
   // increase twice as fast
   if (item.sellIn <= 0) return updateDailyValues(item, item.quality + 2);
   else return updateDailyValues(item, item.quality + 1);
 }
 
-function updateBackstagePasses(item) {
+function updateBackstagePasses(item: Item): Item {
   // increase twice as fast
   if (item.sellIn <= 0) return updateDailyValues(item, MIN_QUALITY);
 
@@ -104,7 +104,7 @@ function updateBackstagePasses(item) {
   else return updateDailyValues(item, item.quality + 1);
 }
 
-function updateSulfuras(item) {
+function updateSulfuras(item: Item): Item {
   // never alter
   return item;
 }
@@ -112,7 +112,7 @@ function updateSulfuras(item) {
 /*
  * Helper functions
  */
-function updateDailyValues(item, newQuality) {
+function updateDailyValues(item: Item, newQuality: number): Item {
   return {
     ...item,
     sellIn: item.sellIn - 1,
@@ -120,7 +120,7 @@ function updateDailyValues(item, newQuality) {
   };
 }
 
-function getItemType(item) {
+function getItemType(item: Item): string {
   if (item.name.startsWith("Conjured")) return ITEM_TYPE.CONJURED;
   if (item.name.startsWith("Aged Brie")) return ITEM_TYPE.AGED_BRIE;
   if (item.name.startsWith("Sulfuras")) return ITEM_TYPE.SULFURAS;
